@@ -23,6 +23,7 @@
 #undef  _WIN32_WINNT
 #define _WIN32_WINNT 0x0601 // Force to include needed API prototypes
 #endif
+#if !UWP
 #include <windows.h>
 // The needed Windows API for processor groups could be missed from old Windows
 // versions, so instead of calling them directly (forcing the linker to resolve
@@ -34,6 +35,7 @@ typedef bool(*fun1_t)(LOGICAL_PROCESSOR_RELATIONSHIP,
 typedef bool(*fun2_t)(USHORT, PGROUP_AFFINITY);
 typedef bool(*fun3_t)(HANDLE, CONST GROUP_AFFINITY*, PGROUP_AFFINITY);
 }
+#endif
 #endif
 
 #include <fstream>
@@ -207,7 +209,11 @@ void prefetch(void* addr) {
 
 namespace WinProcGroup {
 
-#ifndef _WIN32
+#if defined(UWP)
+
+void bindThisThread(size_t) {}
+
+#elif !defined(_WIN32)
 
 void bindThisThread(size_t) {}
 

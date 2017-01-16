@@ -45,7 +45,9 @@
 #else
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
+#if !UWP
 #include <windows.h>
+#endif
 #endif
 
 using namespace Tablebases;
@@ -338,7 +340,9 @@ public:
 
         close(); // Need to re-open to get native file descriptor
 
-#ifndef _WIN32
+#if defined(UWP)
+		exit(1);
+#elif !defined(_WIN32)
         struct stat statbuf;
         int fd = ::open(fname.c_str(), O_RDONLY);
         fstat(fd, &statbuf);
@@ -389,7 +393,9 @@ public:
 
     static void unmap(void* baseAddress, uint64_t mapping) {
 
-#ifndef _WIN32
+#if UWP
+		// Do nothing
+#elif !defined(_WIN32)
         munmap(baseAddress, mapping);
 #else
         UnmapViewOfFile(baseAddress);
